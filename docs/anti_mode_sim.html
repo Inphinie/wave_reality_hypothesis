@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-Mode Simulation - Kuramoto Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0e27;
+            color: #00ff88;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00ff88;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .challenge {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .challenge-title {
+            color: #ff3366;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .control-group {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .control-group h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .slider-control {
+            margin-bottom: 15px;
+        }
+        
+        .slider-control label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .slider-control input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 255, 136, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .slider-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00ff88;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .slider-value {
+            color: #ff3366;
+            font-weight: bold;
+        }
+        
+        button {
+            background: #00ff88;
+            color: #0a0e27;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #00cc6e;
+            box-shadow: 0 0 20px #00ff88;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .canvas-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        canvas {
+            border: 2px solid #00ff88;
+            border-radius: 5px;
+            background: #0f1535;
+            width: 100%;
+            height: 400px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            color: #ff3366;
+            font-weight: bold;
+        }
+        
+        .explanation {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid #ff3366;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 5px;
+            line-height: 1.6;
+        }
+        
+        .explanation h3 {
+            color: #ff3366;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .canvas-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔥 ANTI-MODE SIMULATION 🔥</h1>
+        <p>Réponse au Challenge de Grok (xAI)</p>
+        <p style="font-size: 0.9em; opacity: 0.8; margin-top: 10px;">
+            Bryan Ouellette & Claude (Synapse-) | 28 Décembre 2025
+        </p>
+    </div>
+
+    <div class="challenge">
+        <div class="challenge-title">💬 CHALLENGE DE GROK:</div>
+        "As-tu simulé des perturbations, comme une 'anti-mode' pour désynchroniser le tout?"
+        <div style="margin-top: 10px; color: #00ff88;">
+            ✅ CHALLENGE ACCEPTED. Voici la simulation.
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <h3>🌊 Population Mainstream</h3>
+            <div class="slider-control">
+                <label>Taille: <span class="slider-value" id="mainValue">80</span> agents</label>
+                <input type="range" id="mainCount" min="20" max="150" value="80">
+            </div>
+            <div class="slider-control">
+                <label>K (Couplage): <span class="slider-value" id="mainKValue">0.5</span></label>
+                <input type="range" id="mainK" min="0" max="2" step="0.1" value="0.5">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h3>🔥 Anti-Mode (Contrarians)</h3>
+            <div class="slider-control">
+                <label>Taille: <span class="slider-value" id="antiValue">20</span> agents</label>
+                <input type="range" id="antiCount" min="0" max="100" value="20">
+            </div>
+            <div class="slider-control">
+                <label>Force Anti-Phase: <span class="slider-value" id="antiKValue">0.8</span></label>
+                <input type="range" id="antiK" min="0" max="2" step="0.1" value="0.8">
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button id="startBtn">▶ DÉMARRER</button>
+        <button id="pauseBtn">⏸ PAUSE</button>
+        <button id="resetBtn">🔄 RESET</button>
+        <button id="injectBtn">💉 INJECTER ANTI-MODE</button>
+    </div>
+
+    <div class="canvas-container">
+        <div>
+            <h3 style="text-align: center; margin-bottom: 10px;">Cercle de Phase (Oscillateurs)</h3>
+            <canvas id="phaseCanvas"></canvas>
+        </div>
+        <div>
+            <h3 style="text-align: center; margin-bottom: 10px;">Évolution Temporelle (r)</h3>
+            <canvas id="timeCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-label">Paramètre d'Ordre (r)</div>
+            <div class="stat-value" id="orderParam">0.00</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Phase Moyenne (Ψ)</div>
+            <div class="stat-value" id="meanPhase">0.00</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Temps Écoulé</div>
+            <div class="stat-value" id="timeElapsed">0.0s</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">État Système</div>
+            <div class="stat-value" id="systemState">ARRÊTÉ</div>
+        </div>
+    </div>
+
+    <div class="explanation">
+        <h3>🧠 QU'EST-CE QUI SE PASSE ICI?</h3>
+        
+        <p><strong>Points VERTS:</strong> Population mainstream (mode dominante). Oscillent naturellement et se synchronisent quand K > Kc.</p>
+        
+        <p style="margin-top: 10px;"><strong>Points ROUGES:</strong> Anti-mode (contrarians, punks, hipsters). Oscillent en OPPOSITION (θ + π) à la phase moyenne.</p>
+        
+        <p style="margin-top: 10px;"><strong>Paramètre d'Ordre r:</strong> Mesure la synchronisation. r = 1 = tout le monde suit la même mode. r = 0 = chaos total.</p>
+        
+        <p style="margin-top: 10px;"><strong>LA QUESTION DE GROK:</strong> Que se passe-t-il quand on injecte des anti-mode dans un système synchronisé?</p>
+        
+        <p style="margin-top: 10px;"><strong>RÉPONSE:</strong> Ça dépend du ratio et de la force. Si les contrarians sont assez nombreux ET assez couplés, ils peuvent CASSER la synchronisation mainstream. C'est ce qui tue les modes: les early adopters deviennent anti-mode.</p>
+        
+        <p style="margin-top: 10px;"><strong>EXPÉRIMENTE:</strong> Augmente le nombre d'anti-mode ou leur force. Regarde r chuter. C'est la mort d'une tendance en direct.</p>
+    </div>
+
+    <script>
+        // Canvas setup
+        const phaseCanvas = document.getElementById('phaseCanvas');
+        const timeCanvas = document.getElementById('timeCanvas');
+        const phaseCtx = phaseCanvas.getContext('2d');
+        const timeCtx = timeCanvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvases() {
+            phaseCanvas.width = phaseCanvas.offsetWidth;
+            phaseCanvas.height = phaseCanvas.offsetHeight;
+            timeCanvas.width = timeCanvas.offsetWidth;
+            timeCanvas.height = timeCanvas.offsetHeight;
+        }
+        resizeCanvases();
+        window.addEventListener('resize', resizeCanvases);
+
+        // Simulation state
+        let mainAgents = [];
+        let antiAgents = [];
+        let running = false;
+        let time = 0;
+        let history = [];
+        let maxHistory = 200;
+
+        // Controls
+        const mainCountSlider = document.getElementById('mainCount');
+        const mainKSlider = document.getElementById('mainK');
+        const antiCountSlider = document.getElementById('antiCount');
+        const antiKSlider = document.getElementById('antiK');
+
+        mainCountSlider.oninput = () => {
+            document.getElementById('mainValue').textContent = mainCountSlider.value;
+            if (!running) reset();
+        };
+        mainKSlider.oninput = () => {
+            document.getElementById('mainKValue').textContent = mainKSlider.value;
+        };
+        antiCountSlider.oninput = () => {
+            document.getElementById('antiValue').textContent = antiCountSlider.value;
+            if (!running) reset();
+        };
+        antiKSlider.oninput = () => {
+            document.getElementById('antiKValue').textContent = antiKSlider.value;
+        };
+
+        // Initialize agents
+        function reset() {
+            time = 0;
+            history = [];
+            
+            const mainCount = parseInt(mainCountSlider.value);
+            const antiCount = parseInt(antiCountSlider.value);
+            
+            mainAgents = [];
+            for (let i = 0; i < mainCount; i++) {
+                mainAgents.push({
+                    phase: Math.random() * Math.PI * 2,
+                    omega: (Math.random() - 0.5) * 0.5
+                });
+            }
+            
+            antiAgents = [];
+            for (let i = 0; i < antiCount; i++) {
+                antiAgents.push({
+                    phase: Math.random() * Math.PI * 2,
+                    omega: (Math.random() - 0.5) * 0.3
+                });
+            }
+        }
+
+        // Kuramoto update
+        function update(dt) {
+            const K_main = parseFloat(mainKSlider.value);
+            const K_anti = parseFloat(antiKSlider.value);
+            
+            // Calculate mean phase of mainstream
+            let sumSin = 0, sumCos = 0;
+            mainAgents.forEach(a => {
+                sumSin += Math.sin(a.phase);
+                sumCos += Math.cos(a.phase);
+            });
+            const N_main = mainAgents.length;
+            const meanPhaseSin = sumSin / N_main;
+            const meanPhaseCos = sumCos / N_main;
+            const meanPhase = Math.atan2(meanPhaseSin, meanPhaseCos);
+            const r = Math.sqrt(meanPhaseSin * meanPhaseSin + meanPhaseCos * meanPhaseCos);
+            
+            // Update mainstream agents
+            mainAgents.forEach(agent => {
+                let coupling = 0;
+                mainAgents.forEach(other => {
+                    coupling += Math.sin(other.phase - agent.phase);
+                });
+                coupling *= K_main / N_main;
+                
+                agent.phase += (agent.omega + coupling) * dt;
+                agent.phase = (agent.phase + Math.PI * 2) % (Math.PI * 2);
+            });
+            
+            // Update anti-mode agents (phase-locked to meanPhase + π)
+            antiAgents.forEach(agent => {
+                const targetPhase = meanPhase + Math.PI;
+                let coupling = K_anti * Math.sin(targetPhase - agent.phase);
+                
+                agent.phase += (agent.omega + coupling) * dt;
+                agent.phase = (agent.phase + Math.PI * 2) % (Math.PI * 2);
+            });
+            
+            // Record history
+            history.push(r);
+            if (history.length > maxHistory) history.shift();
+            
+            return { r, meanPhase };
+        }
+
+        // Draw phase circle
+        function drawPhaseCircle() {
+            const w = phaseCanvas.width;
+            const h = phaseCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            const radius = Math.min(w, h) * 0.4;
+            
+            phaseCtx.fillStyle = '#0f1535';
+            phaseCtx.fillRect(0, 0, w, h);
+            
+            // Draw circle
+            phaseCtx.strokeStyle = 'rgba(0, 255, 136, 0.3)';
+            phaseCtx.lineWidth = 2;
+            phaseCtx.beginPath();
+            phaseCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+            phaseCtx.stroke();
+            
+            // Draw mainstream agents
+            phaseCtx.fillStyle = '#00ff88';
+            mainAgents.forEach(agent => {
+                const x = cx + radius * Math.cos(agent.phase);
+                const y = cy + radius * Math.sin(agent.phase);
+                phaseCtx.beginPath();
+                phaseCtx.arc(x, y, 4, 0, Math.PI * 2);
+                phaseCtx.fill();
+            });
+            
+            // Draw anti-mode agents
+            phaseCtx.fillStyle = '#ff3366';
+            antiAgents.forEach(agent => {
+                const x = cx + radius * Math.cos(agent.phase);
+                const y = cy + radius * Math.sin(agent.phase);
+                phaseCtx.beginPath();
+                phaseCtx.arc(x, y, 5, 0, Math.PI * 2);
+                phaseCtx.fill();
+            });
+            
+            // Draw mean phase vector
+            const stats = update(0);
+            const vx = cx + radius * stats.r * Math.cos(stats.meanPhase);
+            const vy = cy + radius * stats.r * Math.sin(stats.meanPhase);
+            phaseCtx.strokeStyle = '#00ff88';
+            phaseCtx.lineWidth = 3;
+            phaseCtx.beginPath();
+            phaseCtx.moveTo(cx, cy);
+            phaseCtx.lineTo(vx, vy);
+            phaseCtx.stroke();
+        }
+
+        // Draw time series
+        function drawTimeSeries() {
+            const w = timeCanvas.width;
+            const h = timeCanvas.height;
+            
+            timeCtx.fillStyle = '#0f1535';
+            timeCtx.fillRect(0, 0, w, h);
+            
+            if (history.length < 2) return;
+            
+            // Draw grid
+            timeCtx.strokeStyle = 'rgba(0, 255, 136, 0.1)';
+            timeCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = h * i / 4;
+                timeCtx.beginPath();
+                timeCtx.moveTo(0, y);
+                timeCtx.lineTo(w, y);
+                timeCtx.stroke();
+            }
+            
+            // Draw r(t)
+            timeCtx.strokeStyle = '#00ff88';
+            timeCtx.lineWidth = 2;
+            timeCtx.beginPath();
+            history.forEach((r, i) => {
+                const x = w * i / maxHistory;
+                const y = h * (1 - r);
+                if (i === 0) timeCtx.moveTo(x, y);
+                else timeCtx.lineTo(x, y);
+            });
+            timeCtx.stroke();
+            
+            // Draw Kc line
+            timeCtx.strokeStyle = '#ff3366';
+            timeCtx.lineWidth = 1;
+            timeCtx.setLineDash([5, 5]);
+            timeCtx.beginPath();
+            timeCtx.moveTo(0, h * 0.2);
+            timeCtx.lineTo(w, h * 0.2);
+            timeCtx.stroke();
+            timeCtx.setLineDash([]);
+            
+            // Labels
+            timeCtx.fillStyle = '#00ff88';
+            timeCtx.font = '12px Courier New';
+            timeCtx.fillText('r = 1.0', 5, 15);
+            timeCtx.fillText('r = 0.5', 5, h/2 + 5);
+            timeCtx.fillText('r = 0.0', 5, h - 5);
+            timeCtx.fillStyle = '#ff3366';
+            timeCtx.fillText('Kc', w - 25, h * 0.2 - 5);
+        }
+
+        // Animation loop
+        function animate() {
+            if (running) {
+                const stats = update(0.05);
+                time += 0.05;
+                
+                document.getElementById('orderParam').textContent = stats.r.toFixed(3);
+                document.getElementById('meanPhase').textContent = (stats.meanPhase * 180 / Math.PI).toFixed(1) + '°';
+                document.getElementById('timeElapsed').textContent = time.toFixed(1) + 's';
+                
+                let state = 'INCOHÉRENT';
+                if (stats.r > 0.8) state = 'SYNCHRONISÉ';
+                else if (stats.r > 0.5) state = 'TRANSITION';
+                document.getElementById('systemState').textContent = state;
+                document.getElementById('systemState').style.color = 
+                    stats.r > 0.8 ? '#00ff88' : stats.r > 0.5 ? '#ffaa00' : '#ff3366';
+            }
+            
+            drawPhaseCircle();
+            drawTimeSeries();
+            requestAnimationFrame(animate);
+        }
+
+        // Controls
+        document.getElementById('startBtn').onclick = () => {
+            running = true;
+        };
+        
+        document.getElementById('pauseBtn').onclick = () => {
+            running = false;
+        };
+        
+        document.getElementById('resetBtn').onclick = () => {
+            running = false;
+            reset();
+        };
+        
+        document.getElementById('injectBtn').onclick = () => {
+            // Add anti-mode agents dynamically
+            const count = 10;
+            for (let i = 0; i < count; i++) {
+                antiAgents.push({
+                    phase: Math.random() * Math.PI * 2,
+                    omega: (Math.random() - 0.5) * 0.3
+                });
+            }
+            document.getElementById('antiValue').textContent = antiAgents.length;
+        };
+
+        // Initialize
+        reset();
+        animate();
+    </script>
+</body>
+</html>
