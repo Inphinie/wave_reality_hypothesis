@@ -70,6 +70,3 @@ Nous rejetons le déterminisme absolu. Si la physique des oscillateurs définit 
 Être libre, ce n'est pas s'extraire de l'onde (ce qui est la mort sociale ou physique), c'est développer l'inertie () et la force de contrôle () nécessaires pour transformer la turbulence en propulsion.
 
 ---
-
-**Statut :** Validé par l'Architecte.
-**Next Step :** Implémentation du terme  dans les simulations Python pour voir comment un agent unique peut dévier une foule.
