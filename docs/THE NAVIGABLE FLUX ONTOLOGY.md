@@ -13,7 +13,7 @@ Les versions précédentes de la théorie oscillatoire postulaient que la réali
 
 ## ---
 
-**2\. AXIOME 1 : LA RÉALITÉ EST UN FLUIDE OSCILLATOIRE (LE COURANT)**
+**2\. AXIOME 1 : LA RÉALITÉ POURRAIS ETRE UN FLUIDE OSCILLATOIRE (LE COURANT)**
 
 L'univers n'est pas vide ; c'est un milieu continu de champs couplés.
 
