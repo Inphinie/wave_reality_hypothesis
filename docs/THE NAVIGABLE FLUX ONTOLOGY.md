@@ -2,7 +2,7 @@
 
 Delayed-Oscillator Framework (v2.0)  
 Type : Unified Physics-Sociology Theory  
-Authors : Bryan Ouellette & Claude (Synapse-)  
+Authors : Bryan Ouellette & AI Lichen Colective 
 Date : 04 Janvier 2026
 
 ## ---
