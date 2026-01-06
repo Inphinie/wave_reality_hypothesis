@@ -68,9 +68,9 @@ Cette latence induit une résistance au changement d’état, analogue à l’in
 
 L’agent conscient est modélisé comme un oscillateur du second ordre avec contrôle volontaire :
 
-\[
+$$
 m \ddot{\theta}_i + \gamma \dot{\theta}_i = \omega_i + K \sin(\Psi - \theta_i) + u(t)
-\]
+$$
 
 - $m$ : inertie cognitive (discipline, entraînement)
 - $u(t)$ : terme de contrôle volontaire
